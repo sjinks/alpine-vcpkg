@@ -12,6 +12,7 @@ permissions:
 
 jobs:
   build:
+    name: Build ${{ matrix.image.image }}
     runs-on: ubuntu-latest
     permissions:
       packages: write
