@@ -1,0 +1,65 @@
+FROM --platform=${BUILDPLATFORM} tonistiigi/xx:master AS xx
+FROM --platform=${BUILDPLATFORM} crazymax/osxcross:latest-alpine AS osxcross
+FROM --platform=${BUILDPLATFORM} alpine:3.22.1
+
+COPY --from=xx / /
+COPY --from=osxcross / /
+RUN \
+    ln -s /osxcross/SDK /xx-sdk && \
+    apk add --no-cache \
+        autoconf \
+        automake \
+        bash \
+        build-base \
+        clang \
+        clang-analyzer \
+        clang-bash-completion \
+        clang-ccache \
+        clang-extra-tools \
+        cmake \
+        compiler-rt \
+        curl \
+        git \
+        i686-mingw-w64-gcc \
+        libtool \
+        lld \
+        llvm \
+        mingw-w64-gcc \
+        ninja-build \
+        ninja-is-really-ninja \
+        perl \
+        pkgconf \
+        powershell \
+        unzip \
+        zip
+
+ENV \
+    VCPKG_FORCE_SYSTEM_BINARIES=1 \
+    VCPKG_DISABLE_METRICS=1
+
+RUN \
+    git clone https://github.com/microsoft/vcpkg.git /vcpkg && \
+    cd /vcpkg && \
+    ./bootstrap-vcpkg.sh -disableMetrics && \
+    ln -s /vcpkg/vcpkg /usr/local/bin/vcpkg
+
+ENV VCPKG_ROOT=/vcpkg
+
+RUN \
+    for i in linux/arm linux/arm64 linux/386 linux/amd64; do \
+        TARGETPLATFORM="${i}" xx-clang --setup-target-triple; \
+        TARGETPLATFORM="${i}" xx-apk add --no-cache build-base libc++ libc++-dev libc++-static linux-headers; \
+    done
+
+RUN \
+    for i in windows/386 windows/amd64 darwin/arm64 darwin/amd64; do \
+        TARGETPLATFORM="${i}" xx-clang --setup-target-triple; \
+    done; \
+    echo "-fuse-ld=ld" >> /usr/bin/i686-w64-mingw32.cfg && \
+    ln -s /osxcross/bin/x86_64-apple-darwin23.6-otool /usr/local/bin/otool; \
+    ln -s /osxcross/bin/x86_64-apple-darwin23.6-install_name_tool /usr/local/bin/install_name_tool
+
+COPY vcpkg-custom-triplets /vcpkg-custom-triplets
+ENV VCPKG_OVERLAY_TRIPLETS=/vcpkg-custom-triplets
+
+WORKDIR /src
