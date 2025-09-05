@@ -10,7 +10,7 @@ RUN \
         autoconf \
         automake \
         bash \
-        build-base \
+        binutils \
         clang \
         clang-analyzer \
         clang-bash-completion \
@@ -19,14 +19,19 @@ RUN \
         cmake \
         compiler-rt \
         curl \
+        file \
+        g++ \
+        gcc \
         git \
         i686-mingw-w64-gcc \
         libtool \
         lld \
         llvm \
+        make \
         mingw-w64-gcc \
         ninja-build \
         ninja-is-really-ninja \
+        patch \
         perl \
         pkgconf \
         powershell \
@@ -48,7 +53,7 @@ ENV VCPKG_ROOT=/vcpkg
 RUN \
     for i in linux/arm linux/arm64 linux/386 linux/amd64; do \
         TARGETPLATFORM="${i}" xx-clang --setup-target-triple; \
-        TARGETPLATFORM="${i}" xx-apk add --no-cache build-base libc++ libc++-dev libc++-static linux-headers; \
+        TARGETPLATFORM="${i}" xx-apk add --no-cache g++ gcc libc++ libc++-dev libc++-static libc-dev linux-headers; \
     done
 
 RUN \
