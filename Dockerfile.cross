@@ -1,5 +1,5 @@
 FROM --platform=${BUILDPLATFORM} tonistiigi/xx:master@sha256:04f5bddc6eadb7a3ff8cc3f6d141555130d6abd0be9981f3b651cf858fcad78e AS xx
-FROM --platform=${BUILDPLATFORM} crazymax/osxcross:latest-alpine@sha256:f4ad7a13f9a030e1b1f1ba60fc62892c28eaf0fb71529f94be8cebdf06a89063 AS osxcross
+FROM --platform=${BUILDPLATFORM} crazymax/osxcross:latest-alpine@sha256:3ad6a857e9f4b418393c41a6cc28ff6f4d6d42fbb06ca80f801c19434a0b181d AS osxcross
 FROM --platform=${BUILDPLATFORM} alpine:3.24.4@sha256:f59abe656b692d901e184be3445e084786602108599d2a51d229c0f5a48c71bf
 
 COPY --from=xx / /
